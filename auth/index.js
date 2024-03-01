@@ -6,4 +6,9 @@ const app = express.Router();
  */
 app.use("/users", require("./routes/users"));
 
+/**
+ * @path /auth/publishers
+ */
+app.use("/publishers", require("./routes/publishers"));
+
 module.exports = app;

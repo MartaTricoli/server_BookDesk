@@ -6,6 +6,7 @@ const bcrypt = require("bcryptjs");
 
 const { User } = require("../../db");
 const { outError } = require("../../utility/errors");
+const { authUser } = require("../../middleware/auth");
 
 /**
  * @path /api/users
@@ -58,6 +59,7 @@ app.post("/", async (req, res) => {
     last_name: Joi.string().required(),
     email: Joi.string().email().required(),
     password: Joi.string().required(),
+    profile_img: Joi.string().optional(),
   });
 
   try {
@@ -76,14 +78,15 @@ app.post("/", async (req, res) => {
 });
 
 /**
- * @path /api/users/:user_id
+ * @path /api/users
  */
-app.put("/:user_id", async (req, res) => {
-  const user_id = req.params.user_id;
+app.put("/", authUser, async (req, res) => {
+  const user_id = req.user._id;
 
   const schema = Joi.object().keys({
     first_name: Joi.string().optional(),
-    last_name: Joi.string().optional()
+    last_name: Joi.string().optional(),
+    profile_img: Joi.string().optional()
   });
 
   try {
@@ -100,10 +103,10 @@ app.put("/:user_id", async (req, res) => {
 });
 
 /**
- * @path /api/users/:user_id
+ * @path /api/users
  */
-app.delete("/:user_id", async (req, res) => {
-  const user_id = req.params.user_id;
+app.delete("/", authUser, async (req, res) => {
+  const user_id = req.user._id;
 
   try {
     await User.deleteOne({ _id: user_id });

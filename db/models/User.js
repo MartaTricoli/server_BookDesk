@@ -37,6 +37,10 @@ const UserSchema = new Schema({
     region: {
         type: String,
         default: null
+    },
+    profile_img: {
+        type: String,
+        default: null
     }
 }, {
     strict: true, //non consentire il salvataggio di dati non espressi nello schema (se il parametro non è specificato nello schema)
