@@ -7,6 +7,7 @@ const bcrypt = require("bcryptjs");
 const { User } = require("../../db");
 const { outError } = require("../../utility/errors");
 const { authUser } = require("../../middleware/auth");
+const { getDateFromString } = require("../../utility/dates");
 
 /**
  * @path /api/users
@@ -58,8 +59,11 @@ app.post("/", async (req, res) => {
     first_name: Joi.string().required(),
     last_name: Joi.string().required(),
     email: Joi.string().email().required(),
-    password: Joi.string().required(),
+    password: Joi.string().min(6).alphanum().required(),
     profile_img: Joi.string().optional(),
+    birth_date: Joi.string().optional(),  
+    gender: Joi.string().valid("male", "female", "nd", null).optional(),  
+    region: Joi.string().optional()  
   });
 
   try {
@@ -67,10 +71,17 @@ app.post("/", async (req, res) => {
 
     data.password = bcrypt.hashSync(data.password);
 
+    if (data.birth_date) {
+      data.birth_date = getDateFromString(data.birth_date);
+    }
+
     const user = await new User(data).save();
 
+    const { password, ...userInfo } = user.toObject();
+
+
     return res.status(201).json({
-        ...user.toObject()
+        ...userInfo
     });
   } catch (error) {
     return outError(res, { error });

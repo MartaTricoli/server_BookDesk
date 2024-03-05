@@ -57,7 +57,7 @@ app.post("/", async (req, res) => {
   const schema = Joi.object().keys({
     name: Joi.string().required(),
     email: Joi.string().email().required(),
-    password: Joi.string().required(),
+    password: Joi.string().min(6).alphanum().required(),
     business_info: Joi.object().keys({
         name: Joi.string().required(),
         city: Joi.string().required(),
@@ -79,8 +79,10 @@ app.post("/", async (req, res) => {
 
     const publisher = await new Publisher(data).save();
 
+    const { password, ...publisherInfo } = publisher.toObject();
+
     return res.status(201).json({
-        ...publisher.toObject()
+        ...publisherInfo
     });
   } catch (error) {
     return outError(res, { error });

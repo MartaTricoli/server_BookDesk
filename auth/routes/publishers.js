@@ -33,7 +33,9 @@ app.post("/token", async (req, res) => {
 
         const token = generateToken({ _id: publisher._id, email: publisher.email, identity: "publisher" });
 
-        return res.status(201).json({ token });
+        delete publisher.password;
+
+        return res.status(201).json({ token, publisher, identity: "publisher" });
     } catch (error) {
         return outError(res, { error });
     }

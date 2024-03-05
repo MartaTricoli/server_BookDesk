@@ -9,6 +9,11 @@ const UserAnaliticSchema = new Schema({
         enum: ["C", "R"], //c = created: inserito in lista, r = read
         required: true
     },
+    user: { 
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
     book: { 
         type: Schema.Types.ObjectId,
         ref: "Book",

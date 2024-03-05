@@ -44,13 +44,16 @@ const PublisherSchema = new Schema({
     info: {
         type: {
             description: {
-                type: String
+                type: String || null,
+                default: null
             },
             cover: {
-                type: String
+                type: String || null,
+                default: null
             },
             logo: {
-                type: String
+                type: String || null,
+                default: null
             }
         }
     }   

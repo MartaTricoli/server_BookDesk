@@ -33,7 +33,9 @@ app.post("/token", async (req, res) => {
 
         const token = generateToken({ _id: user._id, email: user.email, identity: "user" });
 
-        return res.status(201).json({ token });
+        delete user.password;
+
+        return res.status(201).json({ token, user, identity: "user" });
     } catch (error) {
         return outError(res, { error });
     }

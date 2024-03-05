@@ -9,6 +9,11 @@ const PublisherAnaliticSchema = new Schema({
         enum: ["C", "R"], //c = created: inserito in lista, r = read
         required: true
     },
+    publisher: { 
+        type: Schema.Types.ObjectId,
+        ref: "Publisher",
+        required: true
+    },
     book: { 
         type: Schema.Types.ObjectId,
         ref: "Book",
