@@ -11,4 +11,9 @@ app.use("/users", require("./routes/users"));
  */
 app.use("/publishers", require("./routes/publishers"));
 
+/**
+ * @path /auth/verify
+ */
+app.use("/verify", require("./routes/verify"));
+
 module.exports = app;
