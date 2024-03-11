@@ -4,19 +4,27 @@ const mongoosePaginate = require("mongoose-paginate-v2");
 const {Schema, model } = mongoose;
 
 const BookSchema = new Schema({
+    // publisher: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Publisher",
+    //     required: true
+    // },
     publisher: {
-        type: Schema.Types.ObjectId,
-        ref: "Publisher",
+        type: String,
         required: true
     },
     category: {
         type: Schema.Types.ObjectId,
         ref: "Category",
-        required: true
+        required: false
     },
+    // author: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Author",
+    //     required: true
+    // },
     author: {
-        type: Schema.Types.ObjectId,
-        ref: "Author",
+        type: String,
         required: true
     },
     name: { 
@@ -51,7 +59,7 @@ const BookSchema = new Schema({
     rating_count: {
         type: Number,
         default: 0
-    }
+    },
 }, {
     strict: true, //non consentire il salvataggio di dati non espressi nello schema (se il parametro non è specificato nello schema)
     timestamps: true, //aggiunge due chiavi, aggiunge il valore della data in cui sono stati creati i dati e la data dell'ultima modifica dei dati
