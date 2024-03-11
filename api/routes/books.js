@@ -46,9 +46,9 @@ app.post("/list", authUser, retriveBook, async (req, res) => {
 })
 
 /**
- * @path /api/books
+ * @path /api/books/list
  */
-app.get("/", async (req, res) => {
+app.get("/list", authUser, async (req, res) => {
   const schema = Joi.object().keys({ 
     page: Joi.number().optional().default(1),
     limit: Joi.number().optional().default(10),
@@ -57,7 +57,7 @@ app.get("/", async (req, res) => {
   try {
     const data = await schema.validateAsync(req.query);
 
-    const books = await Book.paginate({}, {
+    const books = await UserBook.paginate({}, {
       page: data.page,
       limit: data.limit,
       lean: true
@@ -72,18 +72,33 @@ app.get("/", async (req, res) => {
 });
 
 /**
- * @path /api/books/search?q=:book_title
+ * @path /api/books/list/:book_id
  */
-app.get("/search?q=:book_title", async (req, res) => {
-  const book_title = req.params.book_title;
+app.delete("/list/:book_id", authUser, async (req, res) => {
+  const user = req.user;
+  const book = req.book;
   
   try {
-    const book = await User.findOne({ title: book_title }, null, { lean: true });
-
-    return res.status(200).json(book);
+    await UserBook.deleteOne({ user: user._id, book_id: book }, null, { lean: true })
+    return res.status(200).json({ message: "book deleted" });
   } catch (error) {
-    return outError(res, { error })
+    return outError(res, {error});
   }  
 });
+
+// /**
+//  * @path /api/books/search?q=:book_title
+//  */
+// app.get("/search?q=:book_title", async (req, res) => {
+//   const book_title = req.params.book_title;
+  
+//   try {
+//     const book = await User.findOne({ title: book_title }, null, { lean: true });
+
+//     return res.status(200).json(book);
+//   } catch (error) {
+//     return outError(res, { error })
+//   }  
+// });
 
 module.exports = app;
