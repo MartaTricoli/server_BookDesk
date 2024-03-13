@@ -72,33 +72,67 @@ app.get("/list", authUser, async (req, res) => {
 });
 
 /**
- * @path /api/books/list/:book_id
+ * @path /api/books/list/:book_isbn
  */
-app.delete("/list/:book_id", authUser, async (req, res) => {
+app.delete("/list/:book_isbn", authUser, async (req, res) => {
   const user = req.user;
   const book = req.book;
   
   try {
-    await UserBook.deleteOne({ user: user._id, book_id: book }, null, { lean: true })
+    await UserBook.deleteOne({ user: user._id, book_isbn: book }, null, { lean: true })
     return res.status(200).json({ message: "book deleted" });
   } catch (error) {
     return outError(res, {error});
   }  
 });
 
-// /**
-//  * @path /api/books/search?q=:book_title
-//  */
-// app.get("/search?q=:book_title", async (req, res) => {
-//   const book_title = req.params.book_title;
-  
-//   try {
-//     const book = await User.findOne({ title: book_title }, null, { lean: true });
+/**
+ * @path /api/books/list/:book_id?action=[READING|READ]
+ */
+app.put("/list/:book_id", authUser, async (req, res) => {
+  const user = req.user._id;
+  const _id = req.params.book_id;
+  const action = req.query.action || "READ";
 
-//     return res.status(200).json(book);
-//   } catch (error) {
-//     return outError(res, { error })
-//   }  
-// });
+  const schema = Joi.object().keys({
+    start: Joi.date().optional().default(null),
+    end: Joi.date().optional().default(null)
+  });
+
+  try {
+    const data = await schema.validateAsync(req.body);
+
+    const userBook = await UserBook.findOne({ user, _id }, null, { lean: true });
+
+    if (userBook === null) {
+      return res.status(404).json({ message: "book not found" });
+    }
+
+    let tags = [];
+
+    if (action === "READ") {
+      tags = ["READ", ...userBook.tags.filter(tag => tag !== "READING" && tag !== "TO_READ")];
+    } else if (action === "READING") {
+      tags = ["READING", ...userBook.tags.filter(tag => tag !== "READ" && tag !== "TO_READ")];
+    } else if (action === "TO_READ") {
+      tags = ["TO_READ", ...userBook.tags.filter(tag => tag !== "READING" && tag !== "READ")];
+    }
+
+    const updateObj = {
+      read_date: {
+        ...userBook.read_date
+      },
+      tags
+    }
+    if (data.start) updateObj.read_date.start = data.start;
+    if (data.end) updateObj.read_date.end = data.end;
+    
+    await UserBook.updateOne({ user, _id }, updateObj);
+
+    return res.status(200).json({ message: "userBook updated" });
+  } catch (error) {
+    return outError(res, { error });
+  }
+});
 
 module.exports = app;

@@ -23,23 +23,27 @@ const PublisherSchema = new Schema({
     },
     business_info: {
         type: {
-            name: {
-                type: String
+            business_name: {
+                type: String,
+                required: true
             },
             city: {
-                type: String
+                type: String,
+                required: true
             },
             address: {
-                type: String
+                type: String,
+                required: true
             },
             cap: {
-                type: String
+                type: String,
+                required: true
             },
             p_iva: {
-                type: String
+                type: String,
+                required: true
             }
         },
-        required: true
     },
     info: {
         type: {
@@ -56,6 +60,10 @@ const PublisherSchema = new Schema({
                 default: null
             }
         }
+    },
+    is_verified: {
+        type: Boolean,
+        default: false
     }   
 }, {
     strict: true, //non consentire il salvataggio di dati non espressi nello schema (se il parametro non è specificato nello schema)

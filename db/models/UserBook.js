@@ -18,11 +18,9 @@ const UserBookSchema = new Schema({
         type: {
             start: {
                 type: Date,
-                default: null
             },
             end: {
                 type: Date,
-                default: null
             }
         },
         default: {
@@ -33,7 +31,7 @@ const UserBookSchema = new Schema({
     tags: {
         type: [{
             type: String,
-            enum: ["ALL", "READ", "TO_READ", "FAVOURITES", "WHISHLIST"],
+            enum: ["ALL", "READ", "READING", "TO_READ", "FAVOURITES", "WHISHLIST"],
         }],
         default: ["ALL"]
     }  
