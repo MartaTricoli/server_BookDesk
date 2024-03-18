@@ -29,6 +29,13 @@ const UserBookSchema = new Schema({
             start: null,
             end: null
         }
+    },
+    tags: {
+        type: [{
+            type: String,
+            enum: ["ALL", "READ", "TO_READ", "FAVOURITES", "WHISHLIST"],
+        }],
+        default: ["ALL"]
     }  
 }, {
     strict: true, //non consentire il salvataggio di dati non espressi nello schema (se il parametro non è specificato nello schema)
