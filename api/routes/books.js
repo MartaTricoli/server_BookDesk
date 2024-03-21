@@ -46,7 +46,7 @@ app.post("/list", authUser, retriveBook, async (req, res) => {
 })
 
 /**
- * @path /api/books/list
+ * @path /api/books/list?tag=<String>
  */
 app.get("/list", authUser, async (req, res) => {
   const schema = Joi.object().keys({ 
@@ -54,10 +54,15 @@ app.get("/list", authUser, async (req, res) => {
     limit: Joi.number().optional().default(10),
   })
 
+  const querySchema = Joi.object().keys({
+    tag: Joi.string().valid("ALL", "READ", "READING", "TO_READ", "FAVOURITES", "WHISHLIST").optional(),
+  })
+
   try {
     const data = await schema.validateAsync(req.query);
+    const filterObj = await querySchema.validateAsync(req.query);
 
-    const books = await UserBook.paginate({}, {
+    const books = await UserBook.paginate({...filterObj}, {
       page: data.page,
       limit: data.limit,
       lean: true
@@ -132,6 +137,21 @@ app.put("/list/:book_id", authUser, async (req, res) => {
     return res.status(200).json({ message: "userBook updated" });
   } catch (error) {
     return outError(res, { error });
+  }
+});
+
+/**
+ * @path /api/books/list/:book_id
+ */
+app.get("/list/:book_id", authUser, async (req, res) => {
+  const book_id = req.params.book_id;
+  
+  try {
+    const book = await Book.findOne({ _id: book_id }, null, { lean: true });
+
+    return res.status(200).json(book);
+  } catch (error) {
+    return outError(res, { error })
   }
 });
 

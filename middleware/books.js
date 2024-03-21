@@ -1,36 +1,26 @@
 const Joi = require("joi");
-const axios = require("axios");
 const { formatLink } = require("../utility/links");
 const { outError } = require("../utility/errors");
 
 const retriveBook = async (req, res, next) => {
     const schema = Joi.object().keys({
-        isbn: Joi.string().required(),
+        book: Joi.object().required(),
         tag: Joi.string().optional().default("ALL")
     });
 
     try {
-        const data = await schema.validateAsync(req.body);
-
-        const book_url = formatLink(process.env.BOOK_API, "%_ISBN_%", data.isbn);
-
-        const response = await axios({
-            url: book_url,
-            method: "GET"
-        });
-
-        const book_info = response.data.docs[0];
+        const {book: book_info, tag} = await schema.validateAsync(req.body);
 
         const book = {
             name: book_info.title,
-            publisher: book_info.publisher[0],
-            author: book_info.author_name[0],
-            isbn: data.isbn,
+            publisher: Array.isArray(book_info.publisher) ? book_info.publisher[0] : book_info.publisher,
+            author: Array.isArray(book_info.author_name) ? book_info.author_name[0] : book_info.author_name,
+            isbn: Array.isArray(book_info.isbn) ? book_info.isbn[0] : book_info.isbn,
             cover: formatLink(process.env.BOOK_COVER, "%_COVER_ID_%", book_info.cover_i),
             info: {
-                languages: book_info.language[0],
+                languages: Array.isArray(book_info.language) ? book_info.language[0] : book_info.language,
                 pages: book_info.number_of_pages_median,
-                fpy: book_info.publish_year[0]
+                fpy: Array.isArray(book_info.publish_year) ? book_info.publish_year[0] : book_info.publish_year,
             }
         }
 
