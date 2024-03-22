@@ -6,7 +6,8 @@ const bcrypt = require("bcryptjs");
 
 const { Publisher } = require("../../db");
 const { outError } = require("../../utility/errors");
-const { authUser } = require("../../middleware/auth");
+const { generateEmailVerifyToken } = require("../../utility/auth");
+const { sendMail } = require("../../utility/mailer");
 
 /**
  * @path /api/publishers
@@ -59,12 +60,12 @@ app.post("/", async (req, res) => {
     email: Joi.string().email().required(),
     password: Joi.string().min(6).alphanum().required(),
     business_info: Joi.object().keys({
-        name: Joi.string().required(),
+        business_name: Joi.string().required(),
         city: Joi.string().required(),
         address: Joi.string().required(),
         cap: Joi.string().required(),
         p_iva: Joi.string().required(),
-    }).required(),
+    }),
     info: Joi.object().keys({
         description: Joi.string().optional(),
         cover: Joi.string().optional(),
@@ -80,6 +81,12 @@ app.post("/", async (req, res) => {
     const publisher = await new Publisher(data).save();
 
     const { password, ...publisherInfo } = publisher.toObject();
+
+    const email_verify_token = generateEmailVerifyToken("publisher", {_id: publisherInfo._id, email: publisherInfo.email});
+
+    const email_verify_url = `${process.env.SERVER_HOST}/auth/verify?token=${email_verify_token}&entity=publisher`;
+
+    sendMail({ to: publisherInfo.email, subject: "verify email", html: `<a href="${email_verify_url}">${email_verify_url}</a>`});
 
     return res.status(201).json({
         ...publisherInfo

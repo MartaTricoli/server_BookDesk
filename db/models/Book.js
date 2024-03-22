@@ -11,7 +11,7 @@ const BookSchema = new Schema({
     // },
     publisher: {
         type: String,
-        required: true
+        default: null
     },
     category: {
         type: Schema.Types.ObjectId,
@@ -25,7 +25,7 @@ const BookSchema = new Schema({
     // },
     author: {
         type: String,
-        required: true
+        default: null
     },
     name: { 
         type: String,
