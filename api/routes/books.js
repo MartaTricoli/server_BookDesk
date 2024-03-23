@@ -81,10 +81,11 @@ app.get("/list", authUser, async (req, res) => {
  */
 app.delete("/list/:book_isbn", authUser, async (req, res) => {
   const user = req.user;
-  const book = req.book;
+  const book = req.body.book;
   
   try {
-    await UserBook.deleteOne({ user: user._id, book_isbn: book }, null, { lean: true })
+    console.log(book);
+    await UserBook.deleteOne({ user: user._id, book_isbn: book }, null, { lean: true });
     return res.status(200).json({ message: "book deleted" });
   } catch (error) {
     return outError(res, {error});
