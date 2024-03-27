@@ -77,18 +77,20 @@ app.get("/list", authUser, async (req, res) => {
 });
 
 /**
- * @path /api/books/list/:book_isbn
+ * @path /api/books/list
  */
-app.delete("/list/:book_isbn", authUser, async (req, res) => {
-  const user = req.user;
-  const book = req.book;
+app.delete("/list", authUser, async (req, res) => {
+  const user_id = req.body.user;
+  const _id = req.body.book;
   
   try {
-    await UserBook.deleteOne({ user: user._id, book_isbn: book }, null, { lean: true })
-    return res.status(200).json({ message: "book deleted" });
+    await UserBook.deleteOne({ user: user_id, book: _id});
+    return res.status(200).json({
+      message: "user deleted",
+    });
   } catch (error) {
-    return outError(res, {error});
-  }  
+    return outError(res, { error });
+  }
 });
 
 /**
@@ -116,12 +118,16 @@ app.put("/list/:book_id", authUser, async (req, res) => {
     let tags = [];
 
     if (action === "READ") {
-      tags = ["READ", ...userBook.tags.filter(tag => tag !== "READING" && tag !== "TO_READ")];
+      tags = ["READ", ...userBook.tags.filter(tag => tag !== "READING" && tag !== "TO_READ" && tag !== "WHISHLIST" && tag !== "FAVOURITES")];
     } else if (action === "READING") {
-      tags = ["READING", ...userBook.tags.filter(tag => tag !== "READ" && tag !== "TO_READ")];
+      tags = ["READING", ...userBook.tags.filter(tag => tag !== "READ" && tag !== "TO_READ" && tag !== "WHISHLIST" && tag !== "FAVOURITES")];
     } else if (action === "TO_READ") {
-      tags = ["TO_READ", ...userBook.tags.filter(tag => tag !== "READING" && tag !== "READ")];
-    }
+      tags = ["TO_READ", ...userBook.tags.filter(tag => tag !== "READING" && tag !== "READ" && tag !== "WHISHLIST" && tag !== "FAVOURITES")];
+    } else if (action === "FAVOURITES") {
+      tags = ["FAVOURITES", ...userBook.tags.filter(tag => tag !== "READING" && tag !== "READ" && tag !== "WHISHLIST" && tag !== "TO_READ")];
+    } else if (action === "WHISHLIST") {
+      tags = ["WHISHLIST", ...userBook.tags.filter(tag => tag !== "READING" && tag !== "READ" && tag !== "FAVOURITES" && tag !== "TO_READ")];
+    } 
 
     const updateObj = {
       read_date: {
